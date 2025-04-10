@@ -3,6 +3,7 @@ import { validatePassword } from "../services/userServices";
 import { createSession, findSessions, updateSession } from "../services/sessionService";
 import {signJwt,verifyJwt} from "../Utils/jwt";
 import config from "config";
+import jwt from "jsonwebtoken";
 
 
 export async function createSessionHandler(req: Request, res: Response) {
@@ -13,14 +14,18 @@ export async function createSessionHandler(req: Request, res: Response) {
   }
 
   const session = await createSession(user._id, req.get("user-agent") || "");
+  return res.status(200).send({
+    user,
+    session,
+  });
 
   const accessToken = signJwt(
-    { ...user, session: session._id },
+    { ...user.toJSON(), session: session._id },
     { expiresIn: config.get<number>("accessTokenTtl")}
   );
 
-  const refreshToken = signJwt(
-    { ...user, session: session._id },
+  const refreshToken = verifyJwt(
+   { ...user.toJSON(), session: session._id },
     { expiresIn: config.get<number>("refreshTokenTtl")}
   );
 
