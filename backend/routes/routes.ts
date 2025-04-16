@@ -9,7 +9,13 @@ import {
 } from "../controllers/sessionController";
 import requireUser from "../middleware/requireUser";
 import { createSessionSchema } from "../schema/sessionSchema";
-import { createProductHandler, getProductsHandler } from "../controllers/productController";
+import { createProductHandler,
+        getProductsHandler,
+        getProductHandler,
+        updateProductHandler,
+        deleteProductHandler,
+} from "../controllers/productController";
+
 
 function routes(app: Express) {
   app.get("/healthcheck", (_, res) => res.sendStatus(200));
@@ -18,7 +24,10 @@ function routes(app: Express) {
   app.get("/api/sessions", requireUser, getUserSessionsHandler);
   app.delete("/api/sessions", requireUser, deleteSessionHandler);
   app.post("/api/products", requireUser, createProductHandler);
-app.get("/api/products", getProductsHandler);
+  app.get("/api/products", getProductsHandler);
+  app.get("/api/products/:productId", getProductHandler);
+  app.put("/api/products/:productId", requireUser, updateProductHandler);
+  app.delete("/api/products/:productId", requireUser, deleteProductHandler);
 }
 
 export default routes;
